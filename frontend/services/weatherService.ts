@@ -1,12 +1,11 @@
-// services/weatherService.ts
 import { WeatherData, Units } from '../types/Weather';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 /**
  * Get current weather for a city
- * @param city City name
- * @param units Units (metric or imperial)
+ * @param city 
+ * @param units 
  */
 export const getCurrentWeather = async (
   city: string, 

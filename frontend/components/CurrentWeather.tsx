@@ -1,7 +1,6 @@
-// components/CurrentWeather.tsx
 import React from 'react';
 import { useWeather } from '../context/WeatherContext';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate } from '../utils/dateUtils'
 
 const CurrentWeather: React.FC = () => {
   const { currentWeather, units, loading } = useWeather();

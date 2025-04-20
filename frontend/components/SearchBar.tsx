@@ -1,17 +1,30 @@
-// components/SearchBar.tsx
 import React, { useState, FormEvent } from 'react';
+import { useRouter } from 'next/router';
 import { useWeather } from '../context/WeatherContext';
 
 const SearchBar: React.FC = () => {
   const { city, setCity, fetchWeather, loading } = useWeather();
   const [searchInput, setSearchInput] = useState(city);
+  const router = useRouter();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (searchInput.trim() === '') return;
     
-    setCity(searchInput);
-    fetchWeather(searchInput);
+    // For single word searches, fetch directly
+    if (!searchInput.includes(' ') && !searchInput.includes(',')) {
+      setCity(searchInput);
+      fetchWeather(searchInput);
+      
+      // If we're on the home page, we just update the weather
+      // Otherwise, navigate to the city page
+      if (router.pathname !== '/') {
+        router.push(`/city/${searchInput}`);
+      }
+    } else {
+      // For more complex searches, go to search results page
+      router.push(`/search?q=${encodeURIComponent(searchInput)}`);
+    }
   };
 
   return (

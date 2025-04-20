@@ -1,4 +1,3 @@
-// context/WeatherContext.tsx
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { 
   WeatherContextType, 
@@ -13,7 +12,7 @@ const WeatherContext = createContext<WeatherContextType | undefined>(undefined);
 export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentWeather, setCurrentWeather] = useState<CurrentWeather | null>(null);
   const [forecast, setForecast] = useState<ForecastWeather | null>(null);
-  const [city, setCity] = useState<string>('London'); // Default city
+  const [city, setCity] = useState<string>('London'); 
   const [units, setUnits] = useState<Units>('metric');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +49,7 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Initial weather fetch
   useEffect(() => {
     fetchWeather();
-  }, [units]); // Refetch when units change
+  }, [units]);
 
   const value = {
     currentWeather,

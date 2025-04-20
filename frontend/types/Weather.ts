@@ -1,5 +1,3 @@
-// types/Weather.ts
-
 export interface WeatherData {
   success: boolean;
   data: CurrentWeather | ForecastWeather;
