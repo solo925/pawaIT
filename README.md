@@ -24,7 +24,9 @@ Frontend (NextJS) <--> Backend (Laravel) <--> OpenWeatherMap API
 
 ## Screenshots
 
-[Screenshots will be added here]
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
 
 ## Technologies Used
 
