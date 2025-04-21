@@ -12,7 +12,6 @@ const SettingsContent = () => {
   const [theme, setTheme] = useState('light');
   const [saveMessage, setSaveMessage] = useState('');
 
-  // Load settings from localStorage on component mount
   useEffect(() => {
     const savedCity = localStorage.getItem('defaultCity');
     const savedUnits = localStorage.getItem('defaultUnits') as Units;
@@ -45,11 +44,11 @@ const SettingsContent = () => {
   };
 
   return (
-    <div className="card bg-base-200 p-6 shadow-lg max-w-lg mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Settings</h1>
+    <div className="card bg-base-200 p-8 shadow-xl rounded-3xl max-w-lg mx-auto space-y-8">
+      <h1 className="text-4xl font-bold text-center text-base-content">Settings</h1>
       
       {saveMessage && (
-        <div className="alert alert-success mb-4">
+        <div className="alert alert-success shadow-lg">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -59,26 +58,20 @@ const SettingsContent = () => {
       
       <div className="space-y-6">
         <div className="form-control">
-          <label className="label">
-            <span className="label-text font-medium">Default City</span>
-          </label>
+          <label className="label font-medium">Default City</label>
           <input 
             type="text" 
-            className="input input-bordered" 
+            className="input input-bordered rounded-lg shadow-md"
             value={defaultCity}
             onChange={(e) => setDefaultCity(e.target.value)}
             placeholder="Enter default city"
           />
-          <label className="label">
-            <span className="label-text-alt">This city will be loaded by default when you open the app</span>
-          </label>
+          <label className="label-text-alt text-sm">This city will be loaded by default when you open the app</label>
         </div>
         
         <div className="form-control">
-          <label className="label">
-            <span className="label-text font-medium">Temperature Units</span>
-          </label>
-          <div className="flex space-x-4">
+          <label className="label font-medium">Temperature Units</label>
+          <div className="flex space-x-6">
             <label className="flex items-center cursor-pointer">
               <input 
                 type="radio" 
@@ -86,7 +79,7 @@ const SettingsContent = () => {
                 checked={defaultUnits === 'metric'}
                 onChange={() => setDefaultUnits('metric')}
               />
-              <span className="ml-2">Celsius (°C)</span>
+              <span className="ml-3">Celsius (°C)</span>
             </label>
             <label className="flex items-center cursor-pointer">
               <input 
@@ -95,16 +88,14 @@ const SettingsContent = () => {
                 checked={defaultUnits === 'imperial'}
                 onChange={() => setDefaultUnits('imperial')}
               />
-              <span className="ml-2">Fahrenheit (°F)</span>
+              <span className="ml-3">Fahrenheit (°F)</span>
             </label>
           </div>
         </div>
         
         <div className="form-control">
-          <label className="label">
-            <span className="label-text font-medium">Theme</span>
-          </label>
-          <div className="flex space-x-4">
+          <label className="label font-medium">Theme</label>
+          <div className="flex space-x-6">
             <label className="flex items-center cursor-pointer">
               <input 
                 type="radio" 
@@ -112,7 +103,7 @@ const SettingsContent = () => {
                 checked={theme === 'light'}
                 onChange={() => setTheme('light')}
               />
-              <span className="ml-2">Light</span>
+              <span className="ml-3">Light</span>
             </label>
             <label className="flex items-center cursor-pointer">
               <input 
@@ -121,16 +112,19 @@ const SettingsContent = () => {
                 checked={theme === 'dark'}
                 onChange={() => setTheme('dark')}
               />
-              <span className="ml-2">Dark</span>
+              <span className="ml-3">Dark</span>
             </label>
           </div>
         </div>
         
         <div className="flex justify-between mt-8">
-          <Link href="/" className="btn btn-outline">
+          <Link href="/" className="btn btn-outline bg-gray-200 text-base-content hover:bg-gray-300 rounded-lg">
             Cancel
           </Link>
-          <button className="btn btn-primary" onClick={saveSettings}>
+          <button 
+            className="btn btn-primary bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md transition-all hover:bg-blue-600"
+            onClick={saveSettings}
+          >
             Save Settings
           </button>
         </div>

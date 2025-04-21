@@ -3,6 +3,8 @@ export interface WeatherData {
   data: CurrentWeather | ForecastWeather;
   message?: string;
   error?: any;
+
+
 }
 
 export interface CurrentWeather {
@@ -82,4 +84,36 @@ export interface WeatherContextType {
   loading: boolean;
   error: string | null;
   fetchWeather: (cityName?: string) => Promise<void>;
+  recentSearches: string[];
+  addToRecentSearches: (city: string) => void;
+  searchHistory: string[];
+  addToHistory: (city: string) => void;
+  clearHistory: () => void;
+  
 }
+
+
+export interface CitySearchResponse {
+  success: boolean;
+  data: SearchResult[];
+  message?: string;
+  error?: any;
+}
+
+export interface SearchResult {
+  id: string | number;
+  name: string;
+  country: string;
+  state?: string;
+  lat: number;
+  lon: number;
+}
+
+export interface CitySearchData {
+  success: boolean;
+  data: SearchResult[];
+  message?: string;
+  error?: any;
+}
+
+

@@ -7,6 +7,7 @@ import CurrentWeather from '../components/CurrentWeather';
 import WeatherForecast from '../components/WeatherForecast';
 import UnitToggle from '../components/UnitToggle';
 import ErrorAlert from '../components/ErrorAlert';
+import PopularCities from '../components/PopularCities';
 
 const Home: NextPage = () => {
   return (
@@ -44,6 +45,8 @@ const Home: NextPage = () => {
               <h2 className="text-2xl font-bold">Current Weather</h2>
               <WeatherCityLink />
             </div>
+
+            <PopularCities />
             <CurrentWeather />
             
             <div className="flex justify-between items-center">

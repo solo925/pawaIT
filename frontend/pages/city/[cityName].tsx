@@ -1,91 +1,98 @@
 import { NextPage } from 'next';
-import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 import { WeatherProvider, useWeather } from '../../context/WeatherContext';
 import CurrentWeather from '../../components/CurrentWeather';
-import UnitToggle from '../../components/UnitToggle';
-import ErrorAlert from '../../components/ErrorAlert';
+import WeatherForecast from '../../components/WeatherForecast';
+import SearchBar from '../../components/SearchBar';
+import { getWeatherByCoordinates } from '../../services/weatherService';
 
-const CityDetail = () => {
+const CityWeatherContent = () => {
   const router = useRouter();
-  const { cityName } = router.query;
-  const { setCity, fetchWeather, currentWeather, loading } = useWeather();
+  const { name, lat, lon } = router.query;
+  const { 
+    currentWeather, 
+    forecast, 
+    loading, 
+    error, 
+    setCity
+  } = useWeather();
 
   useEffect(() => {
-    if (cityName && typeof cityName === 'string') {
-      setCity(cityName);
-      fetchWeather(cityName);
+  //  usin coordinates for more accurate weather
+    if (name && typeof name === 'string') {
+      setCity(name);
+      
+      if (lat && lon && typeof lat === 'string' && typeof lon === 'string') {
+        // Custom fetch using coordinates if available
+        const fetchWeatherByCoords = async () => {
+          try {
+            const weatherData = await getWeatherByCoordinates(
+              parseFloat(lat), 
+              parseFloat(lon)
+            );
+            
+            // Update the context with the weather data
+           
+          } catch (err) {
+            console.error('Error fetching weather by coordinates:', err);
+          }
+        };
+        
+        fetchWeatherByCoords();
+      }
     }
-  }, [cityName]);
+  }, [name, lat, lon]);
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">
-            {currentWeather?.name || cityName || 'Loading...'}
-          </h1>
-          <p className="text-base-content/70">Detailed weather information</p>
-        </div>
-        <Link href={`/forecast/${cityName}`} className="btn btn-primary">
-          View Forecast
-        </Link>
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h1 className="text-3xl font-bold">Weather for {name}</h1>
+        <SearchBar />
       </div>
-
-      <ErrorAlert />
-      <CurrentWeather />
-
-      {!loading && currentWeather && (
-        <div className="card bg-base-200 p-6 shadow-lg">
-          <h2 className="text-2xl font-bold mb-4">Additional Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="card bg-base-100 p-4">
-              <h3 className="font-semibold mb-2">Sunrise & Sunset</h3>
-              <p>Sunrise: {new Date(currentWeather.sys.sunrise * 1000).toLocaleTimeString()}</p>
-              <p>Sunset: {new Date(currentWeather.sys.sunset * 1000).toLocaleTimeString()}</p>
-            </div>
-            <div className="card bg-base-100 p-4">
-              <h3 className="font-semibold mb-2">Wind Information</h3>
-              <p>Speed: {currentWeather.wind.speed} m/s</p>
-              <p>Direction: {currentWeather.wind.deg}°</p>
-            </div>
-            <div className="card bg-base-100 p-4">
-              <h3 className="font-semibold mb-2">Atmospheric Conditions</h3>
-              <p>Pressure: {currentWeather.main.pressure} hPa</p>
-              <p>Humidity: {currentWeather.main.humidity}%</p>
-              <p>Visibility: {(currentWeather.visibility / 1000).toFixed(1)} km</p>
-            </div>
-          </div>
+      
+      {error && (
+        <div className="alert alert-error">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{error}</span>
         </div>
       )}
+      
+      <CurrentWeather />
+      
+      <WeatherForecast />
     </div>
   );
 };
 
-const CityDetailPage: NextPage = () => {
+const CityPage: NextPage = () => {
   const router = useRouter();
-  const { cityName } = router.query;
+  const { name } = router.query;
 
   return (
     <WeatherProvider>
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 dark:from-slate-900 dark:to-slate-800">
         <Head>
-          <title>{cityName ? `${cityName} Weather` : 'City Weather'}</title>
-          <meta name="description" content={`Detailed weather information for ${cityName}`} />
+          <title>{name ? `Weather for ${name}` : 'City Weather'} - Weather App</title>
+          <meta name="description" content={`Current weather and forecast for ${name}`} />
         </Head>
 
         <main className="container mx-auto px-4 py-8">
-          <div className="mb-6 flex justify-between items-center">
-            <Link href="/" className="btn btn-outline">
+          <div className="mb-6">
+            <Link href="/" className="btn btn-outline mr-2">
               ← Back to Home
             </Link>
-            <UnitToggle />
+            <Link href={`/search?q=${name}`} className="btn btn-outline">
+              Back to Search
+            </Link>
           </div>
 
-          <CityDetail />
+          <CityWeatherContent />
 
           <footer className="mt-12 text-center text-sm text-base-content/70">
             <p>Powered by OpenWeatherMap API</p>
@@ -96,4 +103,4 @@ const CityDetailPage: NextPage = () => {
   );
 };
 
-export default CityDetailPage;
+export default CityPage;

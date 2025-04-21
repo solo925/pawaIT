@@ -1,4 +1,4 @@
-import { WeatherData, Units } from '../types/Weather';
+import { WeatherData, Units, CitySearchData } from '../types/Weather';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -98,3 +98,43 @@ export const getWeatherByCoordinates = async (
     };
   }
 };
+
+/**
+ * Search for cities by name
+ * @param query City name to search for
+ * @param limit Maximum number of results to return
+ */
+export const searchCities = async (
+  query: string,
+  limit: number = 5
+): Promise<CitySearchData> => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/weather/search?query=${encodeURIComponent(query)}&limit=${limit}`,
+      { method: 'GET' }
+    );
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => null); 
+      throw new Error(error?.message || 'City not found');
+    }
+
+    const result = await response.json();
+    if (!result || !result.data || result.data.length === 0) {
+      throw new Error('No cities found matching your search.');
+    }
+
+    return result;
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error searching cities:', error);
+    }
+
+    return {
+      success: false,
+      data: [],
+      message: error instanceof Error ? error.message : 'An unknown error occurred while searching cities.'
+    };
+  }
+};
+

@@ -1,8 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useWeather } from '../context/WeatherContext';
+import { Droplets, Wind, Thermometer } from 'lucide-react';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+import { formatForecastDate } from '../utils/dateUtils';
+import { colorVariants } from '../constants/constants';
+
 
 const WeatherForecast: React.FC = () => {
   const { forecast, units, loading } = useWeather();
+
+  useEffect(() => {
+    AOS.init({ duration: 800 });
+  }, []);
 
   if (loading) {
     return (
@@ -14,8 +24,8 @@ const WeatherForecast: React.FC = () => {
 
   if (!forecast || !forecast.daily || forecast.daily.length === 0) {
     return (
-      <div className="card bg-base-200 p-4">
-        <p>No forecast data available.</p>
+      <div className="card bg-base-200 p-4 text-center">
+        <p className="text-base-content/80">No forecast data available.</p>
       </div>
     );
   }
@@ -24,43 +34,53 @@ const WeatherForecast: React.FC = () => {
   const windUnit = units === 'metric' ? 'm/s' : 'mph';
 
   return (
-    <div className="card bg-base-200 p-6 shadow-lg">
-      <h2 className="text-2xl font-bold mb-4">5-Day Forecast</h2>
-      
-      <div className="overflow-x-auto">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {forecast.daily.map((day, index) => (
-            <div key={index} className="card bg-base-100 shadow-sm">
-              <div className="card-body p-4">
-                <h3 className="font-bold text-center">{day.day}</h3>
-                <div className="text-center">
-                  <img 
-                    src={`https://openweathermap.org/img/wn/${day.weather.icon}@2x.png`} 
-                    alt={day.weather.description}
-                    className="w-16 h-16 mx-auto"
-                  />
-                  <p className="capitalize text-sm">{day.weather.description}</p>
+    <div className="card bg-base-200 p-6 shadow-xl rounded-2xl">
+      <h2 className="text-2xl font-bold mb-6 text-base-content">5-Day Forecast</h2>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {forecast.daily.map((day, index) => (
+          <div
+            key={index}
+            className={`${colorVariants[index % colorVariants.length]} rounded-2xl p-4 shadow-md hover:shadow-lg transition-all duration-300 flex flex-col items-center text-center space-y-3`}
+            data-aos="fade-up"
+            data-aos-delay={index * 100}
+          >
+            <h3 className="font-semibold text-base-content">
+              {formatForecastDate(day.day)}
+            </h3>
+
+            <img
+              src={`https://openweathermap.org/img/wn/${day.weather.icon}@2x.png`}
+              alt={day.weather.description}
+              className="w-16 h-16"
+            />
+            <p className="capitalize text-sm text-base-content/70">{day.weather.description}</p>
+
+            <div className="flex items-center justify-center gap-2 text-lg font-bold text-primary">
+              <Thermometer className="w-4 h-4" />
+              <span>{Math.round(day.temp_max)}{tempUnit}</span>
+              <span className="text-base-content/60">/</span>
+              <span>{Math.round(day.temp_min)}{tempUnit}</span>
+            </div>
+
+            <div className="text-sm text-base-content/80 space-y-1 w-full">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-1">
+                  <Droplets className="w-4 h-4 text-primary" />
+                  <span>Humidity:</span>
                 </div>
-                
-                <div className="flex justify-between text-sm mt-2">
-                  <span>{Math.round(day.temp_min)}{tempUnit}</span>
-                  <span className="font-semibold">{Math.round(day.temp_max)}{tempUnit}</span>
+                <span>{day.humidity}%</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-1">
+                  <Wind className="w-4 h-4 text-primary" />
+                  <span>Wind:</span>
                 </div>
-                
-                <div className="text-xs mt-2 space-y-1">
-                  <div className="flex justify-between">
-                    <span>Humidity:</span>
-                    <span>{day.humidity}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Wind:</span>
-                    <span>{day.wind.speed} {windUnit}</span>
-                  </div>
-                </div>
+                <span>{day.wind.speed} {windUnit}</span>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -2,20 +2,14 @@ import { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { WeatherProvider } from '../context/WeatherContext';
 import SearchBar from '../components/SearchBar';
+import { searchCities } from '../services/weatherService'
+import { SearchResult } from '../types/Weather';
+import { debounce } from '../utils/debounced';
 
-// Mock data for multiple search results - in a real app, this would come from the API
-interface SearchResult {
-  id: number;
-  name: string;
-  country: string;
-  state?: string;
-  lat: number;
-  lon: number;
-}
 
 const SearchResultsContent = () => {
   const router = useRouter();
@@ -24,38 +18,40 @@ const SearchResultsContent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!q) return;
-    
-    const searchCities = async () => {
+
+  const debouncedSearch = useCallback(
+    debounce(async (query: string) => {
       setLoading(true);
       setError(null);
-      
       try {
-        // In a real implementation, this would be an API call to the backend
-        // For this demo, we're using mock data
-        setTimeout(() => {
-          // Mock results based on query
-          const mockResults = [
-            { id: 1, name: `${q}`, country: 'US', state: 'CA', lat: 34.05, lon: -118.24 },
-            { id: 2, name: `${q} City`, country: 'UK', lat: 51.51, lon: -0.13 },
-            { id: 3, name: `${q}ville`, country: 'FR', lat: 48.85, lon: 2.35 }
-          ];
-          
-          setResults(mockResults);
-          setLoading(false);
-        }, 1000);
+        const response = await searchCities(query);
+        if (!response.success) throw new Error(response.message || 'Failed to fetch search results');
+        setResults(response.data);
       } catch (err) {
-        setError('Failed to fetch search results');
+        setError(err instanceof Error ? err.message : 'Failed to fetch search results');
+        console.error('Error searching cities:', err);
+      } finally {
         setLoading(false);
       }
-    };
-    
-    searchCities();
-  }, [q]);
+    }, 500),
+    []
+  );
+  
+  useEffect(() => {
+    if (typeof q === 'string' && q.trim() !== '') {
+      debouncedSearch(q);
+    }
+  }, [q, debouncedSearch]);
 
   const handleResultClick = (result: SearchResult) => {
-    router.push(`/city/${result.name}`);
+    router.push({
+      pathname: '/city/[name]',
+      query: { 
+        name: result.name,
+        lat: result.lat,
+        lon: result.lon 
+      }
+    });
   };
 
   return (
@@ -99,9 +95,12 @@ const SearchResultsContent = () => {
                       Lat: {result.lat.toFixed(2)}, Lon: {result.lon.toFixed(2)}
                     </p>
                     <div className="card-actions justify-end mt-2">
-                      <Link href={`/city/${result.name}`} className="btn btn-primary btn-sm">
+                      <button 
+                        onClick={() => handleResultClick(result)} 
+                        className="btn btn-primary btn-sm"
+                      >
                         View Weather
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>

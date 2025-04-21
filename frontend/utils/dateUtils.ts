@@ -27,3 +27,19 @@ export const formatDate = (timestamp: number): string => {
       minute: '2-digit'
     });
   };
+
+
+  export const formatForecastDate = (day: string): string => {
+    const parsed = new Date(day);
+    if (!isNaN(parsed.getTime())) {
+      return parsed.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+  
+  
+    return day;
+  };
+  
